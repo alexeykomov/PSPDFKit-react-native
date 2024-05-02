@@ -51,6 +51,9 @@ RCT_CUSTOM_VIEW_PROPERTY(document, PSPDFDocument, RCTPSPDFKitView) {
     }
 
     view.pdfController.pageIndex = view.pageIndex;
+    if ([_configuration objectForKey:@"documentPassword"]) {
+    	[view.pdfController.document unlockWithPassword:[_configuration objectForKey:@"documentPassword"]];
+    }
 
       // Update measurement scale and precision after document is created and remove it from memory after reading
       [PspdfkitMeasurementConvertor setConfig: _configuration document: view.pdfController.document];

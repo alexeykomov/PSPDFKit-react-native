@@ -118,6 +118,7 @@ public class PdfView extends FrameLayout {
     private Disposable documentOpeningDisposable;
     private PdfDocument document;
     private int pageIndex = 0;
+    private String documentPassword;
 
     private boolean isActive = true;
 
@@ -198,6 +199,11 @@ public class PdfView extends FrameLayout {
         internalId = View.generateViewId();
     }
 
+    public void setDocumentPassword(@Nullable String documentPassword) {
+        this.documentPassword = documentPassword;
+        setupFragment();
+    }
+
     public void inject(FragmentManager fragmentManager, EventDispatcher eventDispatcher) {
         this.fragmentManager = fragmentManager;
         this.eventDispatcher = eventDispatcher;
@@ -250,7 +256,7 @@ public class PdfView extends FrameLayout {
             documentOpeningDisposable.dispose();
         }
         updateState();
-        documentOpeningDisposable = PdfDocumentLoader.openDocumentAsync(getContext(), Uri.parse(documentPath))
+        documentOpeningDisposable = PdfDocumentLoader.openDocumentAsync(getContext(), Uri.parse(documentPath), documentPassword)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(pdfDocument -> {
