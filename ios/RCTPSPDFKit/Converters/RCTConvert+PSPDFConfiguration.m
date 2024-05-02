@@ -143,13 +143,6 @@ RCT_ENUM_CONVERTER(PSPDFPageTransition,
                    PSPDFPageTransitionScrollPerSpread,
                    unsignedIntegerValue)
 
-RCT_ENUM_CONVERTER(PSPDFScrollInsetAdjustment,
-                   (@{@"none" : @(PSPDFScrollInsetAdjustmentNone),
-                      @"fixedElements" : @(PSPDFScrollInsetAdjustmentFixedElements),
-                      @"allElements" : @(PSPDFScrollInsetAdjustmentAllElements)}),
-                   PSPDFScrollInsetAdjustmentNone,
-                   unsignedIntegerValue)
-
 RCT_ENUM_CONVERTER(PSPDFDrawCreateMode,
                    (@{@"separate" : @(PSPDFDrawCreateModeSeparate),
                       @"mergeIfPossible" : @(PSPDFDrawCreateModeMergeIfPossible)}),
@@ -264,13 +257,6 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFSettingsOptions,
                          PSPDFSettingsOptionAll,
                          unsignedIntegerValue)
 
-RCT_ENUM_CONVERTER(PSPDFConfigurationSpreadFitting,
-                   (@{@"fit" : @(PSPDFConfigurationSpreadFittingFit),
-                      @"fill" : @(PSPDFConfigurationSpreadFittingFill),
-                      @"adaptive" : @(PSPDFConfigurationSpreadFittingAdaptive)}),
-                   PSPDFScrollInsetAdjustmentNone,
-                   unsignedIntegerValue)
-
 RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingFileFormatOptions,
                          (@{@"PDF" : @(PSPDFDocumentSharingFileFormatOptionPDF),
                             @"original": @(PSPDFDocumentSharingFileFormatOptionOriginal),
@@ -313,7 +299,6 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
   SET(scrollDirection, PSPDFScrollDirection)
   SET(pageTransition, PSPDFPageTransition)
   SET(shouldScrollToChangedPage, BOOL)
-  SET(scrollViewInsetAdjustment, PSPDFScrollInsetAdjustment)
   SET(formElementZoomEnabled, BOOL)
   SET_PROPERTY(enableTextSelection, textSelectionEnabled, BOOL)
   SET(imageSelectionEnabled, BOOL)
@@ -338,7 +323,6 @@ RCT_MULTI_ENUM_CONVERTER(PSPDFDocumentSharingPagesOptions,
   SET(pageMode, PSPDFPageMode)
   SET(firstPageAlwaysSingle, BOOL)
   SET(clipToPageBoundaries, BOOL)
-  SET(spreadFitting, PSPDFConfigurationSpreadFitting)
   SET(backgroundColor, UIColor)
   SET(renderAnimationEnabled, BOOL)
   SET(renderStatusViewPosition, PSPDFRenderStatusViewPosition)
