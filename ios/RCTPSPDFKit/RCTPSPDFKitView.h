@@ -50,6 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAllUnsavedAnnotationsWithError:(NSError *_Nullable *)error;
 - (NSDictionary<NSString *, NSArray<NSDictionary *> *> *)getAllAnnotations:(PSPDFAnnotationType)type error:(NSError *_Nullable *)error;
 - (BOOL)addAnnotations:(NSString *)jsonAnnotations error:(NSError *_Nullable *)error;
+- (void)rotatePage:(id)jsonAnnotation error:(NSError *_Nullable *)error;
 
 /// Forms
 - (NSDictionary<NSString *, NSString *> *)getFormFieldValue:(NSString *)fullyQualifiedName;
