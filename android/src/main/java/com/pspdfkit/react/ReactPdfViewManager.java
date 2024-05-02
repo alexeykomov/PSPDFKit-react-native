@@ -127,6 +127,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public void setConfiguration(PdfView view, @NonNull ReadableMap configuration) {
         ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(view.getContext(), configuration);
         view.setConfiguration(configurationAdapter.build());
+        view.setDocumentPassword(configuration.getString("documentPassword"));
     }
 
      @ReactProp(name = "annotationPresets")
