@@ -52,7 +52,7 @@ RCT_CUSTOM_VIEW_PROPERTY(document, PSPDFDocument, RCTPSPDFKitView) {
 
     view.pdfController.pageIndex = view.pageIndex;
     if ([_configuration objectForKey:@"documentPassword"]) {
-    	[view.pdfController.document unlockWithPassword:[_configuration objectForKey:@"documentPassword"]];
+    	BOOL unlocked = [view.pdfController.document unlockWithPassword:[_configuration objectForKey:@"documentPassword"]];
     }
 
       // Update measurement scale and precision after document is created and remove it from memory after reading
@@ -78,6 +78,10 @@ RCT_CUSTOM_VIEW_PROPERTY(configuration, PSPDFConfiguration, RCTPSPDFKitView) {
             [builder overrideClass:PSPDFFontPickerViewController.class withClass:CustomFontPickerViewController.class];
             [builder setupFromJSON:json];
             _configuration = json;
+
+            if ([_configuration objectForKey:@"documentPassword"]) {
+								BOOL unlocked = [view.pdfController.document unlockWithPassword:[_configuration objectForKey:@"documentPassword"]];
+						}
         }];
 
         [self postProcessConfigurationOptionsWithJSON: json forPDFViewController: view.pdfController];
