@@ -207,37 +207,83 @@
   return @{@"annotations" : annotationsJSON};
 }
 
-- (void)rotatePage:(id)jsonAnnotation error:(NSError *_Nullable *)error {
-  if (![jsonAnnotation isKindOfClass:NSNumber.class]) {
-    NSLog(@"Invalid JSON Annotation.");
-  }
-
-  NSUInteger pageIndex = [((NSNumber *) jsonAnnotation) intValue];
-  PSPDFDocument *document = self.pdfController.document;
-  if (!document) {
-    NSLog(@"Document is nil.");
-    return;
-  }
-
-  // Rotate the first page 90 degrees clockwise
-  PSPDFDocumentEditor *editor = [[PSPDFDocumentEditor alloc] initWithDocument:document];
-  if (!editor) {
-    NSLog(@"Document editing not available.");
-    return;
-  }
-
-  [editor rotatePages:@[@(pageIndex)] rotation:90];
-
-  [editor saveWithCompletionBlock:^(PSPDFDocument *_Nullable document, NSError *_Nullable error) {
-    if (error) {
-      NSLog(@"Error while saving: %@", error);
-    } else {
-      dispatch_async(dispatch_get_main_queue(), ^{
-        // Reload the document in the UI
-        [self.pdfController reloadData];
-      });
+- (void)rotatePage:(NSUInteger)pageIndex error:(NSError *_Nullable *)error {
+    NSUInteger pageCount = self.pdfController.document.pageCount;
+    if (pageIndex >= self.pdfController.document.pageCount) {
+        *error = [NSError errorWithDomain:@"PSPDFKit"
+                                     code:100
+                                 userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Index %lu is out of bounds %lud.", pageIndex, pageCount]}];
     }
-  }];
+    PSPDFDocument *document = self.pdfController.document;
+    if (!document) {
+        NSLog(@"Document is nil.");
+        *error = [NSError errorWithDomain:@"PSPDFKit"
+                                     code:101
+                                 userInfo:@{NSLocalizedDescriptionKey:@"No document"}];
+        return;
+    }
+
+    // Rotate the first page 90 degrees clockwise
+    // Create a processor configuration
+    PSPDFProcessorConfiguration *configuration = [[PSPDFProcessorConfiguration alloc] initWithDocument:document];
+    if (!configuration) {
+        NSLog(@"Could not create a processor configuration. The document might be locked or invalid.");
+        return;
+    }
+
+    // Rotate the first page 90 degrees clockwise
+    [configuration rotatePage:0 by:90];
+
+    // Create a processor with the configuration
+    PSPDFProcessor *processor = [[PSPDFProcessor alloc] initWithConfiguration:configuration securityOptions:nil];
+    if (!processor) {
+        NSLog(@"Could not create a processor.");
+        return;
+    }
+
+    // Write the modified document to a file URL
+    NSString *temporaryDirectory = NSTemporaryDirectory();
+    NSString *uuid = [[NSUUID UUID] UUIDString];
+    NSString *filename = [NSString stringWithFormat:@"modified_document_%@.pdf", uuid];
+    NSString *destinationPath = [temporaryDirectory stringByAppendingPathComponent:filename];
+    NSURL *destinationURL = [NSURL fileURLWithPath:destinationPath];
+
+    BOOL written = [processor writeToFileURL:destinationURL error:error];
+
+    self.pdfController.document = [RCTConvert PSPDFDocument:destinationPath];
+    self.pdfController.document.delegate = (id<PSPDFDocumentDelegate>)self;
+    self.pdfController.pageIndex = self.pageIndex;
+
+    [self.pdfController reloadData];
+
+    if(self.onDocumentLoaded) {
+        self.onDocumentLoaded(@{});
+    }
+
+    /*
+    PSPDFDocumentEditor *editor = [[PSPDFDocumentEditor alloc] initWithDocument:document];
+    if (!editor) {
+        *error = [NSError errorWithDomain:@"PSPDFKit"
+                                     code:102
+                                 userInfo:@{NSLocalizedDescriptionKey:@"Document editing not available."}];
+        NSLog(@"Document editing not available.");
+        return;
+    }
+
+    NSIndexSet *pageIndexSet = [NSIndexSet indexSetWithIndex:pageIndex];
+    [editor rotatePages:pageIndexSet rotation:90];
+
+    [editor saveWithCompletionBlock:^(PSPDFDocument *_Nullable document, NSError *_Nullable error) {
+        if (error) {
+            NSLog(@"Error while saving: %@", error);
+        } else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                // Reload the document in the UI
+                [self.pdfController reloadData];
+            });
+        }
+    }];
+   */
 }
 
 - (BOOL)addAnnotation:(id)jsonAnnotation error:(NSError *_Nullable *)error {
@@ -460,6 +506,11 @@
     }
   }
 
+  UIImage *rotateImage = [UIImage imageNamed:@"rotate"];
+  UIBarButtonItem *rotateButtonItem = [[UIBarButtonItem alloc] initWithImage:rotateImage style:UIBarButtonItemStylePlain target:self action:@selector(rotateButtonTapped:)];
+
+  [rightItems addObject:rotateButtonItem];
+
   if (viewMode.length) {
     [self.pdfController.navigationItem setRightBarButtonItems:[rightItems copy] forViewMode:[RCTConvert PSPDFViewMode:viewMode] animated:animated];
   } else {
@@ -527,6 +578,17 @@
     }
   }];
   return [barButtonItemsString copy];
+}
+
+// Action method for the rotate button
+- (void)rotateButtonTapped:(id)sender {
+    // Implement the action for the rotate button here
+    // Rotate the first page 90 degrees clockwise
+    PSPDFDocument *document = self.pdfController.document;
+    if (!document) {
+        NSLog(@"Document is nil.");
+        return;
+    }
 }
 
 @end
