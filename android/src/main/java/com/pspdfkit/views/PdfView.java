@@ -627,6 +627,50 @@ public class PdfView extends FrameLayout {
                 (throwable) -> eventDispatcher.dispatchEvent(new PdfViewDataReturnedEvent(getId(), requestId, throwable)));
     }
 
+    public void rotatePage(final int requestId, int pageIndex) {
+        if (fragment != null) {
+            // Ensure the document is loaded.
+            if (document == null) {
+                return;
+            }
+
+            // Get the existing rotation offset of the current page.
+            int currentRotationOffset = document.getRotationOffset(pageIndex);
+
+            // Add the desired rotation to the current offset.
+            int newRotation = currentRotationOffset + 90;
+
+            // Make sure that the new rotation offset is in bounds.
+            if (newRotation < 0) {
+                newRotation += 360;
+            } else if (newRotation >= 360) {
+                newRotation -= 360;
+            }
+
+            switch (newRotation) {
+                case 0:
+                    newRotation = PdfDocument.NO_ROTATION;
+                    break;
+                case 90:
+                    newRotation = PdfDocument.ROTATION_90;
+                    break;
+                case 180:
+                    newRotation = PdfDocument.ROTATION_180;
+                    break;
+                case 270:
+                    newRotation = PdfDocument.ROTATION_270;
+                    break;
+                default:
+                    return;
+            }
+
+            // Applies a temporary rotation to the specified page of the document.
+            // This will change the size reported by the document to match the new rotation.
+            // The document will not be modified by this call.
+            document.setRotationOffset(newRotation, pageIndex);
+        }
+    }
+
     public Disposable removeAnnotation(final int requestId, ReadableMap annotation) {
         return getCurrentPdfFragment().map(PdfFragment::getDocument).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

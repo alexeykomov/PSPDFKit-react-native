@@ -65,6 +65,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
     public static final int COMMAND_REMOVE_ANNOTATIONS = 14;
     public  static final int COMMAND_SET_MEASUREMENT_SCALE = 17;
     public static final int COMMAND_SET_MEASUREMENT_PRECISION = 16;
+    public static final int COMMAND_ROTATE = 18;
 
     private final CompositeDisposable annotationDisposables = new CompositeDisposable();
 
@@ -107,6 +108,7 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
         commandMap.put("getAllUnsavedAnnotations", COMMAND_GET_ALL_UNSAVED_ANNOTATIONS);
         commandMap.put("addAnnotations", COMMAND_ADD_ANNOTATIONS);
         commandMap.put("getFormFieldValue", COMMAND_GET_FORM_FIELD_VALUE);
+        commandMap.put("rotatePage", COMMAND_ROTATE);
         commandMap.put("setFormFieldValue", COMMAND_SET_FORM_FIELD_VALUE);
         commandMap.put("removeAnnotation", COMMAND_REMOVE_ANNOTATION);
         commandMap.put("removeAnnotations", COMMAND_REMOVE_ANNOTATIONS);
@@ -256,6 +258,17 @@ public class ReactPdfViewManager extends ViewGroupManager<PdfView> {
                 if (args != null && args.size() == 2) {
                     final int requestId = args.getInt(0);
                     annotationDisposables.add(root.addAnnotation(requestId, args.getMap(1)));
+                }
+                break;
+            case COMMAND_ROTATE:
+                if (args != null) {
+                    final int requestId = args.getInt(0);
+                    try {
+                        root.rotatePage(requestId, args.getInt(1));
+
+                    } catch (Exception e) {
+
+                    }
                 }
                 break;
             case COMMAND_REMOVE_ANNOTATION:
