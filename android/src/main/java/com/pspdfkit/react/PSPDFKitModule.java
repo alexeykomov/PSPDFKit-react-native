@@ -136,6 +136,7 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
                 // We register an activity lifecycle callback so we can get notified of the current activity.
                 getCurrentActivity().getApplication().registerActivityLifecycleCallbacks(this);
             }
+
             ConfigurationAdapter configurationAdapter = new ConfigurationAdapter(getCurrentActivity(), configuration);
             // This is an edge case where file scheme is missing.
             if (Uri.parse(document).getScheme() == null) {
@@ -143,7 +144,9 @@ public class PSPDFKitModule extends ReactContextBaseJavaModule implements Applic
             }
 
             lastPresentPromise = promise;
-            PdfActivity.showDocument(getCurrentActivity(), Uri.parse(document), configurationAdapter.build());
+            String password = configuration.getString("documentPassword");
+
+            PdfActivityWithRotate.showDocument(getCurrentActivity(), Uri.parse(document), password, configurationAdapter.build());
         }
     }
 
