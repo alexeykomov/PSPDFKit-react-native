@@ -64,22 +64,6 @@ RCT_CUSTOM_VIEW_PROPERTY(document, PSPDFDocument, RCTPSPDFKitView) {
     }
 }
 
-RCT_EXPORT_METHOD(rotatePage:(NSNumber *)pageIndex reactTag:(nonnull NSNumber *)reactTag resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        RCTPSPDFKitView *component = (RCTPSPDFKitView *)[self.bridge.uiManager viewForReactTag:reactTag];
-
-        NSError *error = nil;
-        [component rotatePage:[pageIndex intValue] error:&error];
-
-        if (error != nil) {
-            reject(@"error", error.userInfo.description, error);
-            return;
-        }
-        resolve(@(YES));
-    });
-}
-
 RCT_CUSTOM_VIEW_PROPERTY(pageIndex, PSPDFPageIndex, RCTPSPDFKitView) {
   if (json) {
     PSPDFPageIndex idx = [RCTConvert NSUInteger:json];
