@@ -441,7 +441,9 @@ public class PdfView extends FrameLayout {
 
         pdfUiFragment.setOnContextualToolbarLifecycleListener(pdfViewModeController);
         pdfUiFragment.getPSPDFKitViews().getFormEditingBarView().addOnFormEditingBarLifecycleListener(pdfViewModeController);
-        ((ReactPdfUiFragment) pdfUiFragment).setReactPdfUiFragmentListener(new ReactPdfUiFragment.ReactPdfUiFragmentListener() {
+        ReactPdfUiFragment reactPdfUiFragment = ((ReactPdfUiFragment) pdfUiFragment);
+        reactPdfUiFragment.setEventDispatcher(eventDispatcher, getId());
+        reactPdfUiFragment.setReactPdfUiFragmentListener(new ReactPdfUiFragment.ReactPdfUiFragmentListener() {
             @Override
             public void onConfigurationChanged(@NonNull PdfUiFragment pdfUiFragment) {
                 // If the configuration was changed from the UI a new fragment will be created, reattach our listeners.
