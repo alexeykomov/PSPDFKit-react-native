@@ -31,17 +31,14 @@ import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import com.facebook.react.uimanager.events.EventDispatcher;
 import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.react.R;
-import com.pspdfkit.react.events.PdfViewStateChangedEvent;
 import com.pspdfkit.ui.PdfActivity;
 import com.pspdfkit.ui.PdfFragment;
 import com.pspdfkit.ui.PdfUiFragment;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * This {@link PdfUiFragment} provides additional callbacks to improve integration into react native.
@@ -55,10 +52,6 @@ public class ReactPdfUiFragment extends PdfUiFragment {
 
   @Nullable
   private ReactPdfUiFragmentListener reactPdfUiFragmentListener;
-
-  @Nullable
-  private EventDispatcher eventDispatcher;
-  private int viewId;
 
   private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
     @Override
@@ -111,11 +104,6 @@ public class ReactPdfUiFragment extends PdfUiFragment {
     getChildFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
   }
 
-  public void setEventDispatcher(EventDispatcher eventDispatcher, int viewId) {
-    this.eventDispatcher = eventDispatcher;
-    this.viewId = viewId;
-  }
-
   /**
    * Listener that notifies of actions taken directly in the PdfUiFragment.
    */
@@ -130,6 +118,8 @@ public class ReactPdfUiFragment extends PdfUiFragment {
      * Called when the back navigation button was clicked.
      */
     void onNavigationButtonClicked(@NonNull PdfUiFragment pdfUiFragment);
+
+    void onStartDownload();
   }
 
   @NonNull
@@ -170,8 +160,8 @@ public class ReactPdfUiFragment extends PdfUiFragment {
   }
 
   private void downloadPdf() {
-    if (eventDispatcher != null) {
-      eventDispatcher.dispatchEvent(new PdfViewStateChangedEvent(viewId, UUID.randomUUID().toString()));
+    if (reactPdfUiFragmentListener != null) {
+      reactPdfUiFragmentListener.onStartDownload();
     }
   }
 
