@@ -207,6 +207,14 @@
   return @{@"annotations" : annotationsJSON};
 }
 
+- (void)beginDownload {
+    NSUUID *uuid = [NSUUID UUID];
+    NSString *uuidString = [uuid UUIDString];
+    self.onStateChanged(@{
+        @"downloadInitWithUUID" : uuidString
+    });
+}
+
 - (void)rotatePages {
     NSError *error = nil;
     NSUInteger pageCount = self.pdfController.document.pageCount;
@@ -449,6 +457,11 @@
     }
   }
 
+    UIImage *rotateImage = [UIImage imageNamed:@"download"];
+    UIBarButtonItem *downloadButtonItem = [[UIBarButtonItem alloc] initWithImage:rotateImage style:UIBarButtonItemStylePlain target:self action:@selector(downloadButtonTapped:)];
+
+    [leftItems addObject:downloadButtonItem];
+
   if (viewMode.length) {
     [self.pdfController.navigationItem setLeftBarButtonItems:[leftItems copy] forViewMode:[RCTConvert PSPDFViewMode:viewMode] animated:animated];
   } else {
@@ -458,17 +471,18 @@
 
 - (void)setRightBarButtonItems:(nullable NSArray <NSString *> *)items forViewMode:(nullable NSString *) viewMode animated:(BOOL)animated {
   NSMutableArray *rightItems = [NSMutableArray array];
+
+  UIImage *rotateImage = [UIImage imageNamed:@"rotate"];
+  UIBarButtonItem *rotateButtonItem = [[UIBarButtonItem alloc] initWithImage:rotateImage style:UIBarButtonItemStylePlain target:self action:@selector(rotateButtonTapped:)];
+
+  [rightItems addObject:rotateButtonItem];
+
   for (NSString *barButtonItemString in items) {
     UIBarButtonItem *barButtonItem = [RCTConvert uiBarButtonItemFrom:barButtonItemString forViewController:self.pdfController];
     if (barButtonItem && ![self.pdfController.navigationItem.leftBarButtonItems containsObject:barButtonItem]) {
       [rightItems addObject:barButtonItem];
     }
   }
-
-  UIImage *rotateImage = [UIImage imageNamed:@"rotate"];
-  UIBarButtonItem *rotateButtonItem = [[UIBarButtonItem alloc] initWithImage:rotateImage style:UIBarButtonItemStylePlain target:self action:@selector(rotateButtonTapped:)];
-
-  [rightItems addObject:rotateButtonItem];
 
   if (viewMode.length) {
     [self.pdfController.navigationItem setRightBarButtonItems:[rightItems copy] forViewMode:[RCTConvert PSPDFViewMode:viewMode] animated:animated];
@@ -549,6 +563,15 @@
         return;
     }
     [self rotatePages];
+}
+
+- (void)downloadButtonTapped:(id)sender {
+    PSPDFDocument *document = self.pdfController.document;
+    if (!document) {
+        NSLog(@"Document is nil.");
+        return;
+    }
+    [self beginDownload];
 }
 
 @end
