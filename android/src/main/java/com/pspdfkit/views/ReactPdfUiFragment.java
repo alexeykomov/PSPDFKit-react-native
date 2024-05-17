@@ -34,12 +34,14 @@ import androidx.fragment.app.FragmentManager;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.pspdfkit.document.PdfDocument;
 import com.pspdfkit.react.R;
+import com.pspdfkit.react.events.PdfViewStateChangedEvent;
 import com.pspdfkit.ui.PdfActivity;
 import com.pspdfkit.ui.PdfFragment;
 import com.pspdfkit.ui.PdfUiFragment;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * This {@link PdfUiFragment} provides additional callbacks to improve integration into react native.
@@ -169,7 +171,7 @@ public class ReactPdfUiFragment extends PdfUiFragment {
 
   private void downloadPdf() {
     if (eventDispatcher != null) {
-      eventDispatcher.dispatchEvent(new DownloadPdfEvent(viewId));
+      eventDispatcher.dispatchEvent(new PdfViewStateChangedEvent(viewId, UUID.randomUUID().toString()));
     }
   }
 
