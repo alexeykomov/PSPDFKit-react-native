@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.IdRes;
@@ -77,14 +78,14 @@ public class ReactPdfUiFragment extends PdfUiFragment {
     if (getView() == null) {
       return;
     }
+
     Toolbar toolbar = getView().findViewById(R.id.pspdf__toolbar_main);
     if (showNavigationButtonInToolbar) {
-      toolbar.setNavigationIcon(R.drawable.pspdf__ic_navigation_arrow);
-      toolbar.setNavigationOnClickListener(v -> {
-        if (reactPdfUiFragmentListener != null) {
-          reactPdfUiFragmentListener.onNavigationButtonClicked(this);
-        }
-      });
+      toolbar.setNavigationIcon(R.drawable.ic_download);
+      toolbar.setNavigationIcon(
+        getStyledIcon(Objects.requireNonNull(
+          toolbar.getNavigationIcon())));
+      toolbar.setNavigationOnClickListener(v -> downloadPdf());
     } else {
       toolbar.setNavigationIcon(null);
       toolbar.setNavigationOnClickListener(null);
@@ -126,10 +127,23 @@ public class ReactPdfUiFragment extends PdfUiFragment {
   @Override
   public List<Integer> onGenerateMenuItemIds(@NonNull List<Integer> menuItems) {
     menuItems.clear();
-    menuItems.add(R.id.menu_action_download);
     menuItems.add(PdfActivity.MENU_OPTION_SEARCH);
     menuItems.add(R.id.menu_action_rotate);
     return menuItems;
+  }
+
+  private Drawable getStyledIcon(@NonNull Drawable icon) {
+    final TypedArray a = requireContext().getTheme().obtainStyledAttributes(
+      null,
+      com.pspdfkit.R.styleable.pspdf__ActionBarIcons,
+      com.pspdfkit.R.attr.pspdf__actionBarIconsStyle,
+      com.pspdfkit.R.style.PSPDFKit_ActionBarIcons
+    );
+    int mainToolbarIconsColor = a.getColor(com.pspdfkit.R.styleable.pspdf__ActionBarIcons_pspdf__iconsColor,
+      ContextCompat.getColor(requireContext(), android.R.color.white));
+    a.recycle();
+    DrawableCompat.setTint(icon, mainToolbarIconsColor);
+    return icon;
   }
 
   private void addMenuItem(@NonNull Menu menu,
@@ -144,19 +158,7 @@ public class ReactPdfUiFragment extends PdfUiFragment {
     item.setIcon(iconId);
     item.setOnMenuItemClickListener(menuItemListener);
 
-    // Apply toolbar theme color to custom menu item icon
-    Drawable customIcon = Objects.requireNonNull(item.getIcon());
-    final TypedArray a = requireContext().getTheme().obtainStyledAttributes(
-      null,
-      com.pspdfkit.R.styleable.pspdf__ActionBarIcons,
-      com.pspdfkit.R.attr.pspdf__actionBarIconsStyle,
-      com.pspdfkit.R.style.PSPDFKit_ActionBarIcons
-    );
-    int mainToolbarIconsColor = a.getColor(com.pspdfkit.R.styleable.pspdf__ActionBarIcons_pspdf__iconsColor,
-      ContextCompat.getColor(requireContext(), android.R.color.white));
-    a.recycle();
-    DrawableCompat.setTint(customIcon, mainToolbarIconsColor);
-    item.setIcon(customIcon);
+    item.setIcon(getStyledIcon(Objects.requireNonNull(item.getIcon())));
   }
 
   private void downloadPdf() {
@@ -214,11 +216,6 @@ public class ReactPdfUiFragment extends PdfUiFragment {
     MenuItem searchMenuItem = menu.findItem(PdfActivity.MENU_OPTION_SEARCH);
     menu.clear();
 
-    addMenuItem(menu, R.id.menu_action_download, R.string.download, R.drawable.ic_download,
-      0, item -> {
-        downloadPdf();
-        return true;
-      });
     menu.add(Menu.NONE, PdfActivity.MENU_OPTION_SEARCH, 1, searchMenuItem.getTitle());
 
     addMenuItem(menu, R.id.menu_action_rotate, R.string.rotate, R.drawable.ic_rotate,
