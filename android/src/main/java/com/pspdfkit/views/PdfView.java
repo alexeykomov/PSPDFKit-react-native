@@ -478,6 +478,7 @@ public class PdfView extends FrameLayout {
         eventDispatcher.dispatchEvent(new PdfViewStateChangedEvent(getId(), UUID.randomUUID().toString()));
       }
     });
+    setShowNavigationButtonInToolbar(true);
 
     PdfSearchView searchView = pdfUiFragment.getPSPDFKitViews().getSearchView();
     if (searchView instanceof PdfSearchViewInline) {
