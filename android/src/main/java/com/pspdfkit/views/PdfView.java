@@ -234,13 +234,21 @@ public class PdfView extends FrameLayout {
   }
 
   public void setConfiguration(PdfActivityConfiguration configuration) {
-    if (configuration != null && !configuration.equals(this.configuration)) {
+    PdfActivityConfiguration themedConfiguration = configuration != null ?
+      new PdfActivityConfiguration.Builder(
+        configuration, R.style.Adnoc_Theme_Default, R.style.Adnoc_Theme_Dark
+      )
+        .hideDocumentTitleOverlay()
+        .build() : null;
+
+
+    if (themedConfiguration != null && !themedConfiguration.equals(this.configuration)) {
       // The configuration changed, recreate the fragment.
       // We set the current page index so the fragment is created at this location.
       this.pageIndex = fragment != null ? fragment.getPageIndex() : this.pageIndex;
       removeFragment(false);
     }
-    this.configuration = configuration;
+    this.configuration = themedConfiguration;
     setupFragment();
   }
 
